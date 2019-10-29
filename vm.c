@@ -415,7 +415,7 @@ GetSharedPage(int i, int len)
 			void* newpage = kalloc(); // Get new page
     	memset(newpage, 0, PGSIZE); // Zero out page
 			regions[i].physical_pages[j] = V2P(newpage); // Save new page
-			cprintf("New page allocated at virtual %p, physical %p, index %d\n", newpage, V2P(newpage), j);
+			cprintf("New page allocated at virtual %p, physical %p, memory_region index %d\n", newpage, V2P(newpage), j);
 		}
 		regions[i].valid = 1;
 		regions[i].len = len;
@@ -439,7 +439,7 @@ GetSharedPage(int i, int len)
 		return (void*)-2;
 	
 	// Get the lowest virtual address space currently allocated
-	void *va = (void*)0x7FFFF000;
+	void *va = (void*)KERNBASE-PGSIZE;
 	for (int i = 0; i < 32; i++) {
 		if (p->shm[i].id != -1 && (uint)(va) > (uint)(p->shm[i].va)) {
 			va = p->shm[i].va;
@@ -454,7 +454,7 @@ GetSharedPage(int i, int len)
 	// Map them in memory
 	uint addr = (uint)va;
 	for (int k = 0; k < regions[i].len; k++) {
-		cprintf("allocating page %d at %p with size %d (to %p)\n", k, addr+(k*PGSIZE), PGSIZE, addr+(k*PGSIZE)+PGSIZE);
+		cprintf("mapping page %d at %p with size %d (to %p)\n", k, addr+(k*PGSIZE), PGSIZE, addr+(k*PGSIZE)+PGSIZE);
 		mappages(p->pgdir, (void*)(addr + (k*PGSIZE)), PGSIZE, regions[i].physical_pages[k], PTE_W | PTE_U);
 	}
 
