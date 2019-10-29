@@ -91,15 +91,23 @@ sys_uptime(void)
 }
 
 // TODO: Fill in
-int
-sys_getsharedpage(void)
+extern void *GetSharedPage(int i, int len); // For simplicity's sake
+void*
+sys_GetSharedPage(void)
 {
-	return 0;
+	int key;
+	int len;
+
+	if(argint(0, &key) < 0)
+		return (void*)-1;
+	if(argint(1, &len) < 0)
+		return (void*)-1;
+	return (void*)(GetSharedPage(key, len));
 }
 
 // TODO: Fill in
 int
-sys_freesharedpage(void)
+sys_FreeSharedPage(void)
 {
 	return 0;
 }

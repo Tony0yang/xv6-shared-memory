@@ -6037,15 +6037,15 @@ SYSCALL(uptime)
     396e:	cd 40                	int    $0x40
     3970:	c3                   	ret    
 
-00003971 <getsharedpage>:
+00003971 <GetSharedPage>:
 // Added
-SYSCALL(getsharedpage)
+SYSCALL(GetSharedPage)
     3971:	b8 16 00 00 00       	mov    $0x16,%eax
     3976:	cd 40                	int    $0x40
     3978:	c3                   	ret    
 
-00003979 <freesharedpage>:
-SYSCALL(freesharedpage)
+00003979 <FreeSharedPage>:
+SYSCALL(FreeSharedPage)
     3979:	b8 17 00 00 00       	mov    $0x17,%eax
     397e:	cd 40                	int    $0x40
     3980:	c3                   	ret    

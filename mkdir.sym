@@ -14,12 +14,11 @@
 00000000 ulib.c
 00000000 printf.c
 00000390 printint
-000007f4 digits.1105
+000007f4 digits.1106
 00000000 umalloc.c
 00000aac freep
 00000ab0 base
 00000080 strcpy
-00000379 freesharedpage
 00000450 printf
 000002a0 memmove
 00000319 mknod
@@ -27,6 +26,8 @@
 00000351 getpid
 000006b0 malloc
 00000361 sleep
+00000379 FreeSharedPage
+00000371 GetSharedPage
 000002e1 pipe
 000002f1 write
 00000329 fstat
@@ -49,7 +50,6 @@
 00000ab8 _end
 00000331 link
 000002d1 exit
-00000371 getsharedpage
 00000260 atoi
 00000100 strlen
 00000311 open

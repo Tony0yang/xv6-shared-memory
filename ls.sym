@@ -11,17 +11,16 @@
 00000000 .debug_loc
 00000000 .debug_ranges
 00000000 ls.c
-00000e08 buf.1116
+00000e08 buf.1117
 00000000 ulib.c
 00000000 printf.c
 00000660 printint
-00000adc digits.1105
+00000adc digits.1106
 00000000 umalloc.c
 00000e18 freep
 00000e1c base
 00000350 strcpy
 00000060 fmtname
-00000649 freesharedpage
 00000720 printf
 00000570 memmove
 000005e9 mknod
@@ -29,6 +28,8 @@
 00000621 getpid
 00000980 malloc
 00000631 sleep
+00000649 FreeSharedPage
+00000641 GetSharedPage
 000005b1 pipe
 000005c1 write
 000005f9 fstat
@@ -52,7 +53,6 @@
 00000601 link
 00000110 ls
 000005a1 exit
-00000641 getsharedpage
 00000530 atoi
 000003d0 strlen
 000005e1 open

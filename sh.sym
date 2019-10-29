@@ -12,16 +12,15 @@
 00000000 .debug_loc
 00000000 .debug_ranges
 00000000 sh.c
-00001900 buf.1143
+00001900 buf.1144
 00000000 ulib.c
 00000000 printf.c
 00000df0 printint
-00001308 digits.1105
+00001308 digits.1106
 00000000 umalloc.c
 00001964 freep
 00001968 base
 00000ae0 strcpy
-00000dd9 freesharedpage
 00000eb0 printf
 00000d00 memmove
 00000d79 mknod
@@ -37,7 +36,9 @@
 00001110 malloc
 00000dc1 sleep
 000018e0 whitespace
+00000dd9 FreeSharedPage
 00000330 fork1
+00000dd1 GetSharedPage
 000009c0 nulterminate
 00000d41 pipe
 00000110 getcmd
@@ -70,7 +71,6 @@
 00001970 _end
 00000d91 link
 00000d31 exit
-00000dd1 getsharedpage
 00000cc0 atoi
 00000b60 strlen
 00000d71 open

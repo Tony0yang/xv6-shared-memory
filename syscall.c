@@ -104,8 +104,8 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 // Added
-extern int sys_getsharedpage(void);
-extern int sys_freesharedpage(void);
+extern int sys_GetSharedPage(void);
+extern int sys_FreeSharedPage(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -130,8 +130,8 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 // Added
-[SYS_getsharedpage]	sys_getsharedpage,
-[SYS_freesharedpage]	sys_freesharedpage,
+[SYS_GetSharedPage]	sys_GetSharedPage,
+[SYS_FreeSharedPage]	sys_FreeSharedPage,
 };
 
 void

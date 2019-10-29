@@ -1981,15 +1981,15 @@ SYSCALL(uptime)
      dce:	cd 40                	int    $0x40
      dd0:	c3                   	ret    
 
-00000dd1 <getsharedpage>:
+00000dd1 <GetSharedPage>:
 // Added
-SYSCALL(getsharedpage)
+SYSCALL(GetSharedPage)
      dd1:	b8 16 00 00 00       	mov    $0x16,%eax
      dd6:	cd 40                	int    $0x40
      dd8:	c3                   	ret    
 
-00000dd9 <freesharedpage>:
-SYSCALL(freesharedpage)
+00000dd9 <FreeSharedPage>:
+SYSCALL(FreeSharedPage)
      dd9:	b8 17 00 00 00       	mov    $0x17,%eax
      dde:	cd 40                	int    $0x40
      de0:	c3                   	ret    

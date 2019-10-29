@@ -30,5 +30,5 @@ SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
 // Added
-SYSCALL(getsharedpage)
-SYSCALL(freesharedpage)
+SYSCALL(GetSharedPage)
+SYSCALL(FreeSharedPage)

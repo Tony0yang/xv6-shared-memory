@@ -583,15 +583,15 @@ SYSCALL(uptime)
  35e:	cd 40                	int    $0x40
  360:	c3                   	ret    
 
-00000361 <getsharedpage>:
+00000361 <GetSharedPage>:
 // Added
-SYSCALL(getsharedpage)
+SYSCALL(GetSharedPage)
  361:	b8 16 00 00 00       	mov    $0x16,%eax
  366:	cd 40                	int    $0x40
  368:	c3                   	ret    
 
-00000369 <freesharedpage>:
-SYSCALL(freesharedpage)
+00000369 <FreeSharedPage>:
+SYSCALL(FreeSharedPage)
  369:	b8 17 00 00 00       	mov    $0x17,%eax
  36e:	cd 40                	int    $0x40
  370:	c3                   	ret    
