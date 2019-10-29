@@ -447,15 +447,15 @@ GetSharedPage(int i, int len)
 	}
 
 	// Get va of new mapped pages
-	va = (void*)va - (len*4096);
+	va = (void*)va - (len*PGSIZE);
 	p->shm[shind].va = va;
 	p->shm[shind].id = i;
 
 	// Map them in memory
 	uint addr = (uint)va;
 	for (int k = 0; k < regions[i].len; k++) {
-		mappages(p->pgdir, (void*)(addr + (k*4096)), 4096, regions[i].physical_pages[k], PTE_W | PTE_U);
-		cprintf("%p\n", addr+(k*4096));
+		mappages(p->pgdir, (void*)(addr + (k*PGSIZe)), PGSIZE, regions[i].physical_pages[k], PTE_W | PTE_U);
+		cprintf("page %d allocated at %p with size %d\n", addr+(k*PGSIZE));
 		(void)addr;
 	}
 
