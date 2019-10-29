@@ -455,7 +455,7 @@ GetSharedPage(int i, int len)
 	uint addr = (uint)va;
 	for (int k = 0; k < regions[i].len; k++) {
 		mappages(p->pgdir, (void*)(addr + (k*PGSIZe)), PGSIZE, regions[i].physical_pages[k], PTE_W | PTE_U);
-		cprintf("page %d allocated at %p with size %d\n", addr+(k*PGSIZE));
+		cprintf("page %d allocated at %p with size %d\n", k, addr+(k*PGSIZE), PGSIZE);
 		(void)addr;
 	}
 
