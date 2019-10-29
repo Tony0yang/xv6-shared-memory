@@ -44,8 +44,10 @@ walkpgdir(pde_t *pgdir, const void *va, int alloc)
   if(*pde & PTE_P){
     pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
   } else {
-    if(!alloc || (pgtab = (pte_t*)kalloc()) == 0)
+    if(!alloc || (pgtab = (pte_t*)kalloc()) == 0) {
       return 0;
+    }
+
     // Make sure all those PTE_P bits are zero.
     memset(pgtab, 0, PGSIZE);
     // The permissions here are overly generous, but they can
@@ -280,6 +282,9 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   return newsz;
 }
 
+
+void possibly_free_physical_page(void *);
+
 // Free a page table and all the physical memory pages
 // in the user part.
 void
@@ -293,7 +298,7 @@ freevm(pde_t *pgdir)
   for(i = 0; i < NPDENTRIES; i++){
     if(pgdir[i] & PTE_P){
       char * v = P2V(PTE_ADDR(pgdir[i]));
-      kfree(v);
+      possibly_free_physical_page(v);
     }
   }
   kfree((char*)pgdir);
@@ -409,21 +414,32 @@ struct shm_region regions[32];
 void *
 GetSharedPage(int i, int len)
 {
+
+  cprintf("[get %d, %d] ", i, len);
 	// Allocate pages in the appropriate regions' pysical pages
 	if(!regions[i].valid) {
 		for(int j = 0; j < len; j++) {
+
 			void* newpage = kalloc(); // Get new page
     	memset(newpage, 0, PGSIZE); // Zero out page
 			regions[i].physical_pages[j] = V2P(newpage); // Save new page
-			cprintf("New page allocated at virtual %p, physical %p, physical_pages index %d\n", newpage, V2P(newpage), j);
+      cprintf("alloc: ");
 		}
 		regions[i].valid = 1;
 		regions[i].len = len;
 	} else {
 		if(regions[i].len != len)
 			return (void*)-1;
-		cprintf("Picked up old region index %d\n", i);
-	} 
+    cprintf("reuse: ");
+	}
+
+
+  cprintf("[");
+	for(int j = 0; j < len; j++) {
+    cprintf("%p", regions[i].physical_pages[j]);
+    if (j != len-1) cprintf(", ");
+  }
+  cprintf("]\n");
 	regions[i].rc += 1;
 
 	// Find the index in the process
@@ -454,7 +470,7 @@ GetSharedPage(int i, int len)
 	// Map them in memory
 	uint addr = (uint)va;
 	for (int k = 0; k < regions[i].len; k++) {
-		cprintf("mapping page %d at %p with size %d (to %p)\n", k, addr+(k*PGSIZE), PGSIZE, addr+(k*PGSIZE)+PGSIZE);
+		// cprintf("mapping page %d at %p with size %d (to %p)\n", k, addr+(k*PGSIZE), PGSIZE, addr+(k*PGSIZE)+PGSIZE);
 		mappages(p->pgdir, (void*)(addr + (k*PGSIZE)), PGSIZE, regions[i].physical_pages[k], PTE_W | PTE_U);
 	}
 
@@ -477,3 +493,18 @@ free_region(int id) {
 	regions[id].len = 0;
 }
 
+
+
+
+void possibly_free_physical_page(void *v) {
+  for (int i = 0; i < 32; i++) {
+    if (!regions[i].valid) continue;
+    for (int r = 0; r < regions[i].len; r++) {
+      if ((uint)V2P(v) == (uint)regions[i].physical_pages[r]) {
+        cprintf("NO!\n");
+        return;
+      }
+    }
+  }
+  kfree(v);
+}
