@@ -415,7 +415,7 @@ GetSharedPage(int i, int len)
 			void* newpage = kalloc(); // Get new page
     	memset(newpage, 0, PGSIZE); // Zero out page
 			regions[i].physical_pages[j] = V2P(newpage); // Save new page
-			cprintf("New page allocated at virtual %p, physical %p, memory_region index %d\n", newpage, V2P(newpage), j);
+			cprintf("New page allocated at virtual %p, physical %p, physical_pages index %d\n", newpage, V2P(newpage), j);
 		}
 		regions[i].valid = 1;
 		regions[i].len = len;
