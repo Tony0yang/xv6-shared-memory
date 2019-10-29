@@ -439,7 +439,7 @@ GetSharedPage(int i, int len)
 		return (void*)-2;
 	
 	// Get the lowest virtual address space currently allocated
-	void *va = (void*)KERNBASE-1;
+	void *va = (void*)0x7FFFF000;
 	for (int i = 0; i < 32; i++) {
 		if (p->shm[i].id != -1 && (uint)(va) > (uint)(p->shm[i].va)) {
 			va = p->shm[i].va;
@@ -454,15 +454,17 @@ GetSharedPage(int i, int len)
 	// Map them in memory
 	uint addr = (uint)va;
 	for (int k = 0; k < regions[i].len; k++) {
+		cprintf("allocating page %d at %p with size %d (to %p)\n", k, addr+(k*PGSIZE), PGSIZE, addr+(k*PGSIZE)+PGSIZE);
 		mappages(p->pgdir, (void*)(addr + (k*PGSIZE)), PGSIZE, regions[i].physical_pages[k], PTE_W | PTE_U);
-		cprintf("page %d allocated at %p with size %d\n", k, addr+(k*PGSIZE), PGSIZE);
 	}
 
 	// Debug
+	/*
 	cprintf("global regions table after allocation\n");
 	for(int z = 0; z < MAX_REGION_SIZE; z++) {
 		cprintf("[%d]: valid: %d, refcount: %d\n", z, regions[z].valid, regions[z].rc);
 	}
+	*/
 	return va;
 }
 
