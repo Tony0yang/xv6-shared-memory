@@ -427,7 +427,6 @@ void inc_shm_rc(int id) {
 void map_shm_region(int i, struct proc *p, void *addr) {
 	for (int k = 0; k < regions[i].len; k++) {
 
-		cprintf("[%d] %p -> %p\n", p->pid, addr + (k*PGSIZE), regions[i].physical_pages[k]);
 		mappages(p->pgdir, (void*)(addr + (k*PGSIZE)), PGSIZE, regions[i].physical_pages[k], PTE_W | PTE_U);
 	}
 }
@@ -443,7 +442,6 @@ GetSharedPage(int i, int len)
 			void* newpage = kalloc(); // Get new page
     	memset(newpage, 0, PGSIZE); // Zero out page
 			regions[i].physical_pages[j] = V2P(newpage); // Save new page
-			cprintf("pa=%p\n", V2P(newpage));
 		}
 		regions[i].valid = 1;
 		regions[i].len = len;
@@ -479,8 +477,6 @@ GetSharedPage(int i, int len)
 	va = (void*)va - (len*PGSIZE);
 	p->shm[shind].va = va;
 	p->shm[shind].id = i;
-
-	cprintf("va=%p\n", va);
 
 	// Map them in memory
 	map_shm_region(i, p, va);
