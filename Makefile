@@ -183,6 +183,7 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_testsyscalls\
+	_testfork \
 # ^ Added testsyscalls
 
 fs.img: mkfs README $(UPROGS)

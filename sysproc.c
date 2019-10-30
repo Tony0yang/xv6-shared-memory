@@ -105,9 +105,14 @@ sys_GetSharedPage(void)
 	return (void*)(GetSharedPage(key, len));
 }
 
-// TODO: Fill in
+extern int FreeSharedPage(int id);
 int
 sys_FreeSharedPage(void)
 {
-	return 0;
+	int key;
+
+	if(argint(0, &key) < 0)
+		return -0x12;
+	return FreeSharedPage(key);
 }
+

@@ -179,6 +179,11 @@ growproc(int n)
   return 0;
 }
 
+extern void inc_shm_rc(int id); // fwd decl
+
+
+extern int copy_shared_regions(struct proc *, struct proc *);
+
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
@@ -201,6 +206,10 @@ fork(void)
     np->state = UNUSED;
     return -1;
   }
+
+	// copy shared pages!
+	copy_shared_regions(curproc, np); 
+
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;

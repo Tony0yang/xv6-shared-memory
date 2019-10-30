@@ -12,6 +12,9 @@ pde_t *kpgdir;  // for use in scheduler()
 
 
 
+int is_shm_pa(uint);
+
+
 // Set up CPU's kernel segment descriptors.
 // Run once on entry on each CPU.
 void
@@ -330,6 +333,8 @@ copyuvm(pde_t *pgdir, uint sz)
   if((d = setupkvm()) == 0)
     return 0;
   for(i = 0; i < sz; i += PGSIZE){
+
+
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))
@@ -411,11 +416,26 @@ struct shm_region {
 
 struct shm_region regions[32];
 
+
+
+void inc_shm_rc(int id) {
+
+	regions[id].rc++;
+}
+
+
+void map_shm_region(int i, struct proc *p, void *addr) {
+	for (int k = 0; k < regions[i].len; k++) {
+
+		cprintf("[%d] %p -> %p\n", p->pid, addr + (k*PGSIZE), regions[i].physical_pages[k]);
+		mappages(p->pgdir, (void*)(addr + (k*PGSIZE)), PGSIZE, regions[i].physical_pages[k], PTE_W | PTE_U);
+	}
+}
+
 void *
 GetSharedPage(int i, int len)
 {
 
-  cprintf("[get %d, %d] ", i, len);
 	// Allocate pages in the appropriate regions' pysical pages
 	if(!regions[i].valid) {
 		for(int j = 0; j < len; j++) {
@@ -423,23 +443,16 @@ GetSharedPage(int i, int len)
 			void* newpage = kalloc(); // Get new page
     	memset(newpage, 0, PGSIZE); // Zero out page
 			regions[i].physical_pages[j] = V2P(newpage); // Save new page
-      cprintf("alloc: ");
+			cprintf("pa=%p\n", V2P(newpage));
 		}
 		regions[i].valid = 1;
 		regions[i].len = len;
+		regions[i].rc = 0;
 	} else {
 		if(regions[i].len != len)
 			return (void*)-1;
-    cprintf("reuse: ");
 	}
 
-
-  cprintf("[");
-	for(int j = 0; j < len; j++) {
-    cprintf("%p", regions[i].physical_pages[j]);
-    if (j != len-1) cprintf(", ");
-  }
-  cprintf("]\n");
 	regions[i].rc += 1;
 
 	// Find the index in the process
@@ -467,21 +480,25 @@ GetSharedPage(int i, int len)
 	p->shm[shind].va = va;
 	p->shm[shind].id = i;
 
-	// Map them in memory
-	uint addr = (uint)va;
-	for (int k = 0; k < regions[i].len; k++) {
-		// cprintf("mapping page %d at %p with size %d (to %p)\n", k, addr+(k*PGSIZE), PGSIZE, addr+(k*PGSIZE)+PGSIZE);
-		mappages(p->pgdir, (void*)(addr + (k*PGSIZE)), PGSIZE, regions[i].physical_pages[k], PTE_W | PTE_U);
-	}
+	cprintf("va=%p\n", va);
 
-	// Debug
-	/*
-	cprintf("global regions table after allocation\n");
-	for(int z = 0; z < MAX_REGION_SIZE; z++) {
-		cprintf("[%d]: valid: %d, refcount: %d\n", z, regions[z].valid, regions[z].rc);
-	}
-	*/
+	// Map them in memory
+	map_shm_region(i, p, va);
+
 	return va;
+}
+
+int copy_shared_regions(struct proc *p, struct proc *np) {
+	for (int i = 0; i < 32; i++) {
+		if (p->shm[i].id != -1) {
+			np->shm[i] = p->shm[i];
+			// map into the new forked proc
+			int id = np->shm[i].id;
+			regions[id].rc++;
+			map_shm_region(id, np, np->shm[i].va);
+		}
+	}
+	return 0;
 }
 
 void
@@ -493,18 +510,50 @@ free_region(int id) {
 	regions[id].len = 0;
 }
 
+int
+FreeSharedPage(int id)
+{
+	struct proc *p = myproc();
+	void *va = 0;
+	for (int i = 0; i < 32; i++) {
+		if (p->shm[i].id == id) {
+			va = p->shm[i].va;
+			p->shm[i].id = -1;
+			p->shm[i].va = 0;
+			break;
+		}
+	}
+	if(va == 0)
+		return -1;
 
+	struct shm_region* reg = &regions[id];
+	for(int i = 0; i < reg->len; i++) {
+		pte_t* pte = walkpgdir(p->pgdir, (char*)va + i*PGSIZE, 0);
+		if(pte == 0) {
+			return -0x12;
+		}
+		*pte = 0;
+	}
 
+	reg->rc--;
+	if(reg->rc == 0) {
+		free_region(id);
+	}
 
-void possibly_free_physical_page(void *v) {
+	return 0;
+}
+
+int is_shm_pa(uint v) {
   for (int i = 0; i < 32; i++) {
     if (!regions[i].valid) continue;
     for (int r = 0; r < regions[i].len; r++) {
-      if ((uint)V2P(v) == (uint)regions[i].physical_pages[r]) {
-        cprintf("NO!\n");
-        return;
+      if (v == (uint)regions[i].physical_pages[r]) {
+        return 1;
       }
     }
   }
-  kfree(v);
+	return 0;
+}
+void possibly_free_physical_page(void *v) {
+  if (!is_shm_pa(V2P(v))) kfree(v);
 }
