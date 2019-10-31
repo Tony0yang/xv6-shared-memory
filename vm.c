@@ -440,7 +440,7 @@ GetSharedPage(int i, int len)
 		for(int j = 0; j < len; j++) {
 
 			void* newpage = kalloc(); // Get new page
-    	memset(newpage, 0, PGSIZE); // Zero out page
+      memset(newpage, 0, PGSIZE); // Zero out page
 			regions[i].physical_pages[j] = V2P(newpage); // Save new page
 		}
 		regions[i].valid = 1;
@@ -464,7 +464,7 @@ GetSharedPage(int i, int len)
 	}
 	if (shind == -1)
 		return (void*)-2;
-	
+
 	// Get the lowest virtual address space currently allocated
 	void *va = (void*)KERNBASE-PGSIZE;
 	for (int i = 0; i < 32; i++) {
