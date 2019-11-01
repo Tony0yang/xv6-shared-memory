@@ -112,7 +112,7 @@ sys_FreeSharedPage(void)
 	int key;
 
 	if(argint(0, &key) < 0)
-		return -0x12;
+		return -1;
 	return FreeSharedPage(key);
 }
 

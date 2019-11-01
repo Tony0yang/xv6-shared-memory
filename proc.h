@@ -34,8 +34,9 @@ struct context {
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+// Track mapped shared pages
 struct shared_mapping_extent {
-	int id;
+	int key;
 	void *va;
 };
 

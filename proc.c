@@ -111,9 +111,9 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-
+	// Added: Initialize shared mapping extent as empty
 	for (int i = 0; i < 32; i++) {
-		p->shm[i].id = -1;
+		p->shm[i].key = -1;
 		p->shm[i].va = 0;
 	}
 
@@ -178,9 +178,6 @@ growproc(int n)
   switchuvm(curproc);
   return 0;
 }
-
-extern void inc_shm_rc(int id); // fwd decl
-
 
 extern int copy_shared_regions(struct proc *, struct proc *);
 
